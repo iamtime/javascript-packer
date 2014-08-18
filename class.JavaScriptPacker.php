@@ -161,7 +161,7 @@ class JavaScriptPacker {
 		// replace: $name -> n, $$name -> na
 		// ptcong edited
 		// to avoid conflict vars: buttons1, buttons2
-		// rename $name -> ne,
+		// append md5($name)[strlen($name) -1] to renamed
 		$parser->add('/((\\x24+)([a-zA-Z$_]+))(\\d*)/',
 					 array('fn' => '_replace_name')
 		);
@@ -689,8 +689,9 @@ class ParseMaster {
 	private function _replace_name($match, $offset){
 		$length = strlen($match[$offset + 2]);
 		$start = $length - max($length - strlen($match[$offset + 3]), 0);
+		$hash = md5($match[$offset]);
 
-		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4] . substr($match[$offset + 1], -1);
+		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4] . substr($hash, -1);
 	}
 
 	private function _replace_encoded($match, $offset) {
