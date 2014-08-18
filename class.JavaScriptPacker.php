@@ -689,7 +689,7 @@ class ParseMaster {
 	private function _replace_name($match, $offset){
 		$length = strlen($match[$offset + 2]);
 		$start = $length - max($length - strlen($match[$offset + 3]), 0);
-		$hash = md5($match[$offset]);
+		$hash = str_replace('f', '', md5($match[$offset])); // avoid name to "if"
 
 		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4] . substr($hash, -1);
 	}
