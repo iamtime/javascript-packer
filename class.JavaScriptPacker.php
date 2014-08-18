@@ -3,6 +3,7 @@
  * Edited by ptcong90 - Aug 13, 2014
  * {@link _escape}
  * {@link _escapeBis}
+ * {@link _encodeSpecialChars}
  *
  */
 /* 9 April 2008. version 1.1
@@ -158,6 +159,9 @@ class JavaScriptPacker {
 	private function _encodeSpecialChars($script) {
 		$parser = new ParseMaster();
 		// replace: $name -> n, $$name -> na
+		// ptcong edited
+		// to avoid conflict vars: buttons1, buttons2
+		// rename $name -> ne,
 		$parser->add('/((\\x24+)([a-zA-Z$_]+))(\\d*)/',
 					 array('fn' => '_replace_name')
 		);
@@ -685,7 +689,8 @@ class ParseMaster {
 	private function _replace_name($match, $offset){
 		$length = strlen($match[$offset + 2]);
 		$start = $length - max($length - strlen($match[$offset + 3]), 0);
-		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4];
+
+		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4] . substr($match[$offset + 1], -1);
 	}
 
 	private function _replace_encoded($match, $offset) {
