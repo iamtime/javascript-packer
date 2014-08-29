@@ -693,7 +693,8 @@ class ParseMaster {
 	}
 
 	// ptcong edited
-	private $_replacementChars = 'abcdefghijklmnopqrstuvwxyz'; // 26
+	private $_replacementChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$';
+	private $_invalidNames = 'do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof';
 	private $_names = array();
 	private $_currentPos = 0;
 
@@ -709,6 +710,10 @@ class ParseMaster {
 			}
 			$named .= $this->_replacementChars[$this->_currentPos % $replacementIndex];
 			$this->_currentPos++;
+			if (preg_match('#^(?:' . $this->_invalidNames . ')$#', $named)) {
+				$this->_currentPos++;
+				return $this->getHashName($match);
+			}
 
 			$this->_names[$varName] = $named;
 		}
