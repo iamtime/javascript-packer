@@ -1,9 +1,9 @@
 <?php
 /**
  * Edited by ptcong90 - Aug 13, 2014
- * {@link _escape}
- * {@link _escapeBis}
- * {@link _encodeSpecialChars}
+ * {@link _escape} - fixed wrong revert string '\n'
+ * {@link _escapeBis} - fixed wrong revert string '\n'
+ * {@link _encodeSpecialChars} - smart rename to a,b,c...
  *
  */
 /* 9 April 2008. version 1.1
@@ -159,12 +159,18 @@ class JavaScriptPacker {
 	private function _encodeSpecialChars($script) {
 		$parser = new ParseMaster();
 		// replace: $name -> n, $$name -> na
+		// $parser->add('/((\\x24+)([a-zA-Z$_]+))(\\d*)/',
+		// 			 array('fn' => '_replace_name')
+		// );
+
 		// ptcong edited
 		// to avoid conflict vars: buttons1, buttons2
-		// append md5($name)[strlen($name) -1] to renamed
-		$parser->add('/((\\x24+)([a-zA-Z$_]+))(\\d*)/',
+		// and use smart named
+		$parser->add('/((\\x24+|this\.)([a-zA-Z$_]+))(\\d*)/',
 					 array('fn' => '_replace_name')
 		);
+		// end edited
+
 		// replace: _name -> _0, double-underscore (__name) is ignored
 		$regexp = '/\\b_[A-Za-z\\d]\\w*/';
 		// build the word list
@@ -686,18 +692,36 @@ class ParseMaster {
 		return $replacement;
 	}
 
-	private function _replace_name($match, $offset){
-		$length = strlen($match[$offset + 2]);
-		$start = $length - max($length - strlen($match[$offset + 3]), 0);
-		$hash = str_replace('f', '', md5($match[$offset])); // avoid name to "if"
+	// ptcong edited
+	private $_replacementChars = 'abcdefghijklmnopqrstuvwxyz'; // 26
+	private $_names = array();
+	private $_currentPos = 0;
 
-		return substr($match[$offset + 1], $start, $length) . $match[$offset + 4] . substr($hash, -1);
+	private function getHashName($match) {
+		static $replacementCount;
+		if ( ! isset($this->_names[$match[0]])) {
+			$replacementCount = $replacementCount ? $replacementCount : strlen($this->_replacementChars);
+			$named = $match[3] == 'this.' ? 'this.' : '';
+			if ($this->_currentPos > $replacementCount) {
+				$named .= $this->_replacementChars[intval($this->_currentPos % $replacementCount)];
+			}
+			$named .= $this->_replacementChars[$this->_currentPos % $replacementCount];
+			$this->_currentPos++;
+
+			$this->_names[$match[0]] = $named;
+		}
+
+		return $this->_names[$match[0]];
 	}
+
+	private function _replace_name($match, $offset){
+		return $this->getHashName($match);
+	}
+	// end edited
 
 	private function _replace_encoded($match, $offset) {
 		return $this->buffer[$match[$offset]];
 	}
-
 
 	// php : we cannot pass additional data to preg_replace_callback,
 	// and we cannot use &$this in create_function, so let's go to lower level
@@ -759,4 +783,3 @@ class ParseMaster {
 		return preg_replace($this->ESCAPE, '', $string);
 	}
 }
-?>
