@@ -166,7 +166,7 @@ class JavaScriptPacker {
 		// ptcong edited
 		// to avoid conflict vars: buttons1, buttons2
 		// and use smart named
-		$parser->add('/((\\x24+|this\.)([a-zA-Z$_]+))(\\d*)/',
+		$parser->add('/((\\x24+)([a-zA-Z$_]+))(\\d*)/',
 					 array('fn' => '_replace_name')
 		);
 		// end edited
@@ -699,19 +699,21 @@ class ParseMaster {
 
 	private function getHashName($match) {
 		static $replacementCount;
-		if ( ! isset($this->_names[$match[0]])) {
-			$replacementCount = $replacementCount ? $replacementCount : strlen($this->_replacementChars);
-			$named = $match[3] == 'this.' ? 'this.' : '';
+		$replacementCount = $replacementCount ? $replacementCount : strlen($this->_replacementChars);
+		$varName = $match[0];
+		if ( ! isset($this->_names[$varName])) {
+
+			$named = '';
 			if ($this->_currentPos > $replacementCount) {
 				$named .= $this->_replacementChars[intval($this->_currentPos % $replacementCount)];
 			}
 			$named .= $this->_replacementChars[$this->_currentPos % $replacementCount];
 			$this->_currentPos++;
 
-			$this->_names[$match[0]] = $named;
+			$this->_names[$varName] = $named;
 		}
 
-		return $this->_names[$match[0]];
+		return $this->_names[$varName];
 	}
 
 	private function _replace_name($match, $offset){
