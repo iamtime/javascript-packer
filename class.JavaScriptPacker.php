@@ -698,16 +698,16 @@ class ParseMaster {
 	private $_currentPos = 0;
 
 	private function getHashName($match) {
-		static $replacementCount;
-		$replacementCount = $replacementCount ? $replacementCount : strlen($this->_replacementChars);
+		static $replacementIndex;
+		$replacementIndex = $replacementIndex ? $replacementIndex : strlen($this->_replacementChars);
 		$varName = $match[0];
 		if ( ! isset($this->_names[$varName])) {
 
 			$named = '';
-			if ($this->_currentPos > $replacementCount) {
-				$named .= $this->_replacementChars[intval($this->_currentPos % $replacementCount)];
+			if ($this->_currentPos >= $replacementIndex) {
+				$named .= $this->_replacementChars[intval($this->_currentPos / $replacementIndex) - 1];
 			}
-			$named .= $this->_replacementChars[$this->_currentPos % $replacementCount];
+			$named .= $this->_replacementChars[$this->_currentPos % $replacementIndex];
 			$this->_currentPos++;
 
 			$this->_names[$varName] = $named;
