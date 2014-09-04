@@ -693,28 +693,39 @@ class ParseMaster {
 	}
 
 	// ptcong edited
-	private $_replacementChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$';
-	private $_invalidNames = 'do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof';
 	private $_names = array();
 	private $_currentPos = 0;
 
-	private function getHashName($match) {
-		static $replacementIndex;
-		$replacementIndex = $replacementIndex ? $replacementIndex : strlen($this->_replacementChars);
-		$varName = $match[0];
-		if ( ! isset($this->_names[$varName])) {
-
-			$named = '';
-			if ($this->_currentPos >= $replacementIndex) {
-				$named .= $this->_replacementChars[intval($this->_currentPos / $replacementIndex) - 1];
+	private function toBase($num, $b=63) {
+		$base = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
+		$r = $num  % $b ;
+		$res = $base[$r];
+		$q = floor($num/$b);
+		while ($q) {
+			$r = $q % $b;
+			if ($q < $b) {
+				$r = $r-1;
 			}
-			$named .= $this->_replacementChars[$this->_currentPos % $replacementIndex];
-			$this->_currentPos++;
-			if (preg_match('#^(?:' . $this->_invalidNames . ')$#', $named)) {
+			$q =floor($q/$b);
+			$res = $base[$r].$res;
+		}
+		return $res;
+	}
+
+	private function getHashName($match) {
+		$varName = $match[0];
+
+		if ( ! isset($this->_names[$varName])) {
+			$named = $this->toBase($this->_currentPos);
+			if (
+				preg_match(
+				'#^(do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
+				|| is_numeric($named[0])
+			) {
 				$this->_currentPos++;
 				return $this->getHashName($match);
 			}
-
+			$this->_currentPos++;
 			$this->_names[$varName] = $named;
 		}
 
