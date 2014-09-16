@@ -694,9 +694,9 @@ class ParseMaster {
 
 	// ptcong edited
 	private $_names = array();
-	private $_currentPos = 0;
+	private $_names_count = 0;
 
-	private function toBase($num, $b=63) {
+	private function to_base($num, $b=63) {
 		$base = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
 		$r = $num  % $b ;
 		$res = $base[$r];
@@ -712,28 +712,24 @@ class ParseMaster {
 		return $res;
 	}
 
-	private function getHashName($match) {
-		$varName = $match[0];
+	private function _replace_name($match, $offset){
+		$varname = $match[0];
 
-		if ( ! isset($this->_names[$varName])) {
-			$named = $this->toBase($this->_currentPos);
+		if (empty($this->_names[$varname])) {
+			$named = $this->to_base($this->_names_count);
 			if (
 				preg_match(
-				'#^(do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
-				|| is_numeric($named[0])
+				'#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
 			) {
-				$this->_currentPos++;
-				return $this->getHashName($match);
+				$this->_names_count++;
+
+				return $this->_replace_name($match, null);
 			}
-			$this->_currentPos++;
-			$this->_names[$varName] = $named;
+			$this->_names_count++;
+			$this->_names[$varname] = $named;
 		}
 
-		return $this->_names[$varName];
-	}
-
-	private function _replace_name($match, $offset){
-		return $this->getHashName($match);
+		return $this->_names[$varname];
 	}
 	// end edited
 
