@@ -1,9 +1,10 @@
 <?php
 /**
- * Edited by ptcong90 - Aug 13, 2014
- * {@link _escape} - fixed wrong revert string '\n'
- * {@link _escapeBis} - fixed wrong revert string '\n'
- * {@link _encodeSpecialChars} - smart rename to a,b,c to avoid conflict named.
+ * @edited by ptcong90 <ptcong90 at gmail dot com>
+ * @date Aug 13, 2014
+ * @changes
+ * 	+ Fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
+ *  + Improved rename variables to special character (any -> a, any -> b, and ->c) instead of (pack -> p, packer -> p ??)
  */
 
 /* 9 April 2008. version 1.1
@@ -770,31 +771,6 @@ class ParseMaster {
 
 			return preg_replace_callback(
 				$regexp,
-				array(&$this, '_unescapeBis'),
-				$string
-			);
-		} else {
-			return $string;
-		}
-	}
-	private function _unescapeBis() {
-
-		if (isset($this->_escaped[$this->buffer['i']])
-			&& $this->_escaped[$this->buffer['i']] != '')
-		{
-			 $temp = $this->_escaped[$this->buffer['i']];
-
-		} else {
-			$temp = '';
-		}
-		$this->buffer['i']++;
-		return $this->buffer['escapeChar'] . $temp;
-	}
-
-	private function _internalEscape($string) {
-		return preg_replace($this->ESCAPE, '', $string);
-	}
-}
 				array(&$this, '_unescapeBis'),
 				$string
 			);
