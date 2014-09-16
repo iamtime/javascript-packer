@@ -717,13 +717,12 @@ class ParseMaster {
 
 		if (empty($this->_names[$varname])) {
 			$named = $this->to_base($this->_names_count);
+
 			if (
-				preg_match(
-				'#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
+				preg_match('#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
 			) {
 				$this->_names_count++;
-
-				return $this->_replace_name($match, null);
+				return $this->_replace_name($match, $offset);
 			}
 			$this->_names_count++;
 			$this->_names[$varname] = $named;
