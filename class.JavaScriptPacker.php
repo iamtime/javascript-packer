@@ -3,9 +3,9 @@
  * Edited by ptcong90 - Aug 13, 2014
  * {@link _escape} - fixed wrong revert string '\n'
  * {@link _escapeBis} - fixed wrong revert string '\n'
- * {@link _encodeSpecialChars} - smart rename to a,b,c...
- *
+ * {@link _encodeSpecialChars} - smart rename to a,b,c to avoid conflict named.
  */
+
 /* 9 April 2008. version 1.1
  *
  * This is the php version of the Dean Edwards JavaScript's Packer,
@@ -713,14 +713,13 @@ class ParseMaster {
 	}
 
 	private function _replace_name($match, $offset){
-		$varname = $match[0];
+		static $invalid = '#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i';
 
+		$varname = $match[0];
 		if (empty($this->_names[$varname])) {
 			$named = $this->to_base($this->_names_count);
 
-			if (
-				preg_match('#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i', $named)
-			) {
+			if (preg_match($invalid, $named)) {
 				$this->_names_count++;
 				return $this->_replace_name($match, $offset);
 			}
@@ -771,6 +770,31 @@ class ParseMaster {
 
 			return preg_replace_callback(
 				$regexp,
+				array(&$this, '_unescapeBis'),
+				$string
+			);
+		} else {
+			return $string;
+		}
+	}
+	private function _unescapeBis() {
+
+		if (isset($this->_escaped[$this->buffer['i']])
+			&& $this->_escaped[$this->buffer['i']] != '')
+		{
+			 $temp = $this->_escaped[$this->buffer['i']];
+
+		} else {
+			$temp = '';
+		}
+		$this->buffer['i']++;
+		return $this->buffer['escapeChar'] . $temp;
+	}
+
+	private function _internalEscape($string) {
+		return preg_replace($this->ESCAPE, '', $string);
+	}
+}
 				array(&$this, '_unescapeBis'),
 				$string
 			);
