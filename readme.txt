@@ -20,5 +20,5 @@ by Phan Thanh Cong <ptcong90@gmail.com>
 * improved variable renaming
 
 ##### version 1.2 (aug 13, 2014):
-* fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
+* fixed a bug, '\n' packed then unpacked becomes '\'.
 * improved variable renaming (any -> a, any -> b, any ->c) instead of (pack -> p, packer -> p ??)
