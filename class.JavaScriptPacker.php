@@ -704,8 +704,8 @@ class ParseMaster {
 
 	private function _get_name() {
 		$num = $this->_names_count;
-		$b = 63;
-		$base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz';
+		$base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+		$b = strlen($base);
 		$r = $num  % $b;
 		$res = $base[$r];
 		$q = floor($num/$b);
