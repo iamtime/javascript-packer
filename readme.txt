@@ -12,14 +12,12 @@ PHP 4, you can find their equivalent here :
 http://pear.php.net/package/PHP_Compat
 
 
-/**
- * Edited Version by Phan Thanh Cong <ptcong90@gmail.com>
- *
- * changelog:
- * version 1.3 (jan 19, 2015)
- * - improved variable renaming
- *
- * version 1.2 (aug 13, 2014):
- * - fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
- * - improved variable renaming (any -> a, any -> b, any ->c) instead of (pack -> p, packer -> p ??)
- */
+### Edited Version by Phan Thanh Cong <ptcong90@gmail.com>
+
+#### changelog:
+##### version 1.3 (jan 19, 2015)
+* improved variable renaming
+
+##### version 1.2 (aug 13, 2014):
+* fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
+* improved variable renaming (any -> a, any -> b, any ->c) instead of (pack -> p, packer -> p ??)
