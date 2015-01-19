@@ -1,11 +1,16 @@
 <?php
 /**
- * @edited by ptcong90 <ptcong90 at gmail dot com>
- * @date Aug 13, 2014
- * @changes
- * 	+ Fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
- *  + Improved rename variables to special character (any -> a, any -> b, and ->c) instead of (pack -> p, packer -> p ??)
+ * Edited Version by Phan Thanh Cong <ptcong90@gmail.com>
+ *
+ * changelog:
+ * version 1.3 (jan 19, 2015)
+ * - improved variable renaming
+ *
+ * version 1.2 (aug 13, 2014):
+ * - fixed wrong revert string '\n' (previous time the class revert '\n' to '\')
+ * - improved variable renaming (any -> a, any -> b, any ->c) instead of (pack -> p, packer -> p ??)
  */
+
 
 /* 9 April 2008. version 1.1
  *
@@ -697,9 +702,11 @@ class ParseMaster {
 	private $_names = array();
 	private $_names_count = 0;
 
-	private function to_base($num, $b=63) {
-		$base = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
-		$r = $num  % $b ;
+	private function _get_name() {
+		$num = $this->_names_count;
+		$b = 63;
+		$base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz';
+		$r = $num  % $b;
 		$res = $base[$r];
 		$q = floor($num/$b);
 		while ($q) {
@@ -707,20 +714,30 @@ class ParseMaster {
 			if ($q < $b) {
 				$r = $r-1;
 			}
-			$q =floor($q/$b);
+			$q = floor($q/$b);
 			$res = $base[$r].$res;
 		}
 		return $res;
 	}
 
 	private function _replace_name($match, $offset){
-		static $invalid = '#^(\d.*?|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof|e|index|element)$#i';
+		static $keywords = array(
+			'abstract','as','boolean','break','byte','case','catch','char','class',
+	        'const','continue','debugger','default','delete','do','double','else',
+	        'enum','export','extends','false','final','finally','float','for',
+	        'function','goto','if','implements','import','in','instanceof','int',
+	        'long','native','new','null','package','private','protected','public',
+	        'return','short','static','super','switch','synchronized','this',
+	        'throw','throws','transient','true','try','typeof','var','void',
+	        'while','with','yield','let','interface',
+	        // avoid conflict with some variables
+	        'index', 'e', 'err',
+		);
 
 		$varname = $match[0];
 		if (empty($this->_names[$varname])) {
-			$named = $this->to_base($this->_names_count);
-
-			if (preg_match($invalid, $named)) {
+			$named = $this->_get_name();
+			if (in_array($named, $keywords)) {
 				$this->_names_count++;
 				return $this->_replace_name($match, $offset);
 			}
