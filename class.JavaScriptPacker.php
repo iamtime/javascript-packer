@@ -737,11 +737,10 @@ class ParseMaster {
 		$varname = $match[0];
 		if (empty($this->_names[$varname])) {
 			$named = $this->_get_name();
+			$this->_names_count++;
 			if (in_array($named, $keywords)) {
-				$this->_names_count++;
 				return $this->_replace_name($match, $offset);
 			}
-			$this->_names_count++;
 			$this->_names[$varname] = $named;
 		}
 
