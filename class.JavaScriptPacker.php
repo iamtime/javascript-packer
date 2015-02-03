@@ -711,9 +711,7 @@ class ParseMaster {
 		$q = floor($num/$b);
 		while ($q) {
 			$r = $q % $b;
-			if ($q < $b) {
-				$r = $r-1;
-			}
+			if ($q == 1 && $r == 1) $r = 0;
 			$q = floor($q/$b);
 			$res = $base[$r].$res;
 		}
